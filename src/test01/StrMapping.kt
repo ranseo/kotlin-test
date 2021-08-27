@@ -2,8 +2,41 @@ package test01
 
 fun main() {
     var str1 = ""
-    if(str1.length == 0) str1 = "abcdefghijklmn.p"
+    if(str1.length == 0) str1 = "asd"
+
+    var str3 = "......a..b..c"
+
+    //str3 = str3.replace(Regex("[.]+"), ".")
+    str3 = str3.replace("..", ".")
+
+
    //str1 = str1.filterNot{it == '.'}
+
+
+
+    println(str3)
+
+
+    var str4 = ".asdasdbasd......"
+
+    str4 = str4.filterIndexed{i,v -> (i != str4.length-1) && (v!='.')}
+
+
+    println(str4)
+
+
+
+    var str5 = "abcdefghijklm..p"
+
+    var str6 = "abcde"
+
+    println("str6 = $str6")
+
+    str5 = str5.substring(0..14)
+    str5 = str5.filterIndexed{i,v -> (i != str5.lastIndex) || (v != '.')}
+
+    println(str5)
+
     str1 = str1.filter { it == '.' || it == '_' || it == '-' || (it >= '0' && it <= '9') || (it >= 'a' && it <= 'z')}
 
     println(str1)
@@ -49,7 +82,7 @@ fun main() {
         }
 
         fun String.stageOne() = this.toLowerCase()
-        fun String.stageTwo() = this.filter { it.isLetter().or(it.isDigit()).or(it == '.').or(it == '_').or(it == '-') }
+        fun String.stageTwo() = this.filter { it.isLetterOrDigit().or(it == '.').or(it == '_').or(it == '-') }
         fun String.stageThree() = this.replace(Regex("[.]+"), ".")
         fun String.stageFour() = this.filterIndexed { index, c -> (index != 0 || c != '.') && (index != this.lastIndex || c != '.') }
         fun String.stageFive() = if (this == "") this + "a" else this
