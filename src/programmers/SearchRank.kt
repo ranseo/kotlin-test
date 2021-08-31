@@ -1,11 +1,13 @@
 package programmers
 
+import java.util.*
 import java.util.function.Function
+import kotlin.collections.HashMap
 
 var combKey : String = ""
 
 
-fun Combination(answer: MutableList<String>, comb:ArrayList<ArrayList<String>>, start:Int, target:Int, idx:ArrayList<Int>){
+fun Combination(answer: MutableList<String>, comb:List<List<String>>, start:Int, target:Int, idx:List<Int>){
     if(0==target) {
         answer.add(combKey)
     }
@@ -21,6 +23,7 @@ fun Combination(answer: MutableList<String>, comb:ArrayList<ArrayList<String>>, 
 }
 
 fun main() {
+    var answer = mutableListOf<Int>()
     var dataMap: HashMap<String, MutableList<Int>> = hashMapOf()
 
     val info: Array<String> = arrayOf(
@@ -40,8 +43,6 @@ fun main() {
         "- and - and - and - 150"
     )
 
-    var answer: List<Int> = listOf()
-
     //1.info를 문자열부분과 숫자부분으로 나눠주자. 문자열 부분은 dataMap의 key가 되고, 숫자부분은 value가 된다.
     for (i in info) {
         val split = i.split(" ")
@@ -51,24 +52,80 @@ fun main() {
         dataMap.getOrPut(key) { mutableListOf() }.add(value)
     }
 
-    println(dataMap)
-
-    dataMap.map { (key, value) -> value.sortDescending() }
-
-    println(dataMap)
-
-
+    dataMap.map { (key, value) -> value.sort()}
+//
+//    println()
     //2.query도 문자열부분과 숫자부분으로 나눠주자. 문자열 부분은 dataMap의 key가 되고, 숫자부분은 value가 된다.
     for (i in query) {
-        val split = i.replace(" and", "").split(" ")
+//        println()
+//        println("query = $i")
+//        println()
+        var totalTester = 0
+        var split = i.replace(" and", "").split(" ")
+        val value: Int = split[4].toInt()
+//        println("value = $value")
+        split = split.dropLast(1)
         val indexList = mutableListOf<Int>()
-        for((index,value) in split.withIndex()) {
-            if(value == "-") {
+        resetList()
+
+        for((index,v) in split.withIndex()) {
+            if(v == "-") {
+                arrList[index].addAll(ArrList[index])
                 indexList.add(arrList[index].size)
-            } else indexList.add(1)
+            } else {
+                arrList[index].add(v)
+                indexList.add(1)
+            }
         }
 
+        val combs = mutableListOf<String>()
+        Combination(combs, arrList, 0, arrList.size, indexList)
+
+        //println(answer)
+        combs.forEach { comb ->
+//            print("comb = $comb ")
+            val satisfiedList = dataMap?.get(comb) ?: return@forEach
+//            println()
+//            println("satisfiedList = $satisfiedList")
+
+
+            var start = 0
+            var end = satisfiedList.size
+
+            while(start < end) {
+                var mid = (start+end)/2
+
+                if(satisfiedList.get(mid) < value) start = mid+1
+                else end = mid
+            }
+            val searchPoint = satisfiedList.size - start
+//            println("searchPoint = $searchPoint")
+
+            totalTester += searchPoint
+//            println("totalTester = $totalTester")
+        }
+
+        answer.add(totalTester)
     }
+    println()
+    println(answer)
+}
+
+
+val tools = mutableListOf<String>()
+val jobGroup= mutableListOf<String>()
+val career = mutableListOf<String>()
+val soulFood = mutableListOf<String>()
+
+var arrList = mutableListOf(tools, jobGroup, career, soulFood)
+
+fun resetList() {
+    tools.clear()
+    jobGroup.clear()
+    career.clear()
+    soulFood.clear()
+
+    arrList = mutableListOf(tools, jobGroup, career, soulFood)
 }
 
 val Tools = arrayOf("java", "python", "cpp")
@@ -76,5 +133,5 @@ val JobGroup = arrayOf("backend", "frontend")
 val Career = arrayOf("junior", "senior")
 val SoulFood = arrayOf("pizza", "chicken")
 
-val arrList = arrayOf(Tools, JobGroup, Career, SoulFood)
+val ArrList = arrayOf(Tools, JobGroup, Career, SoulFood)
 
