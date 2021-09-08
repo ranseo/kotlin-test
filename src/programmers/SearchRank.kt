@@ -6,13 +6,11 @@ import kotlin.collections.HashMap
 
 var combKey : String = ""
 
-
 fun Combination(answer: MutableList<String>, comb:List<List<String>>, start:Int, target:Int, idx:List<Int>){
     if(0==target) {
         answer.add(combKey)
     }
 
-    //comb의 사이즈는 4개
     for(i in start until comb.size) {
         for(j in 0..idx[i]-1) {
             combKey += comb[i][j]
@@ -43,7 +41,7 @@ fun main() {
         "- and - and - and - 150"
     )
 
-    //1.info를 문자열부분과 숫자부분으로 나눠주자. 문자열 부분은 dataMap의 key가 되고, 숫자부분은 value가 된다.
+    //1-1.info를 문자열부분과 숫자부분으로 나눠주자. 문자열 부분은 dataMap의 key가 되고, 숫자부분은 value가 된다.
     for (i in info) {
         val split = i.split(" ")
 
@@ -52,19 +50,17 @@ fun main() {
         dataMap.getOrPut(key) { mutableListOf() }.add(value)
     }
 
-    dataMap.map { (key, value) -> value.sort()}
-//
-//    println()
-    //2.query도 문자열부분과 숫자부분으로 나눠주자. 문자열 부분은 dataMap의 key가 되고, 숫자부분은 value가 된다.
+    dataMap.map { (_, value) -> value.sort()}
+
     for (i in query) {
-//        println()
-//        println("query = $i")
-//        println()
-        var totalTester = 0
+        //query각 string을 list로 만들고, value값 따로 만든 뒤 해당 list에서 맨마지막값(value)은 삭제하는 과정
+        var totalScore = 0
         var split = i.replace(" and", "").split(" ")
         val value: Int = split[4].toInt()
-//        println("value = $value")
         split = split.dropLast(1)
+
+        //쿼리에 - 있을 경우, 해당 조건의 모든 요소들이 포함되기 때문에 조합 알고리즘을 이용하여
+        //가능한 조합으로 쿼리를 재구성하여 쿼리를 다시 만든다.
         val indexList = mutableListOf<Int>()
         resetList()
 
@@ -81,36 +77,36 @@ fun main() {
         val combs = mutableListOf<String>()
         Combination(combs, arrList, 0, arrList.size, indexList)
 
-        //println(answer)
+        //재구성된 쿼리를 hashMap의 key로 사용해 해당 value가 있는지 확인
+        //해당 value(=mutableList<Int>)가 있다면 이 리스트를 이용해 lower bound 알고리즘을 사용
+        //쿼리에서 찾으려는 value보다 크거나 같은 원소의 index를 찾아 반환하면, 이를 리스트의 사이즈에서 차감
+        //이는 곧 몇명의 인원 해당 쿼리의 점수 이상을 받았는지 알 수 있다.
         combs.forEach { comb ->
-//            print("comb = $comb ")
-            val satisfiedList = dataMap?.get(comb) ?: return@forEach
-//            println()
-//            println("satisfiedList = $satisfiedList")
-
-
-            var start = 0
-            var end = satisfiedList.size
-
-            while(start < end) {
-                var mid = (start+end)/2
-
-                if(satisfiedList.get(mid) < value) start = mid+1
-                else end = mid
-            }
-            val searchPoint = satisfiedList.size - start
-//            println("searchPoint = $searchPoint")
-
-            totalTester += searchPoint
-//            println("totalTester = $totalTester")
+            val scoreList = dataMap?.get(comb) ?: return@forEach
+            val score = scoreList.size - findLowerBound(scoreList, 0, scoreList.size, value)
+            totalScore += score
         }
 
-        answer.add(totalTester)
+        answer.add(totalScore)
     }
-    println()
     println(answer)
 }
 
+typealias Index = Int
+fun findLowerBound(list: List<Int>, start:Index, end:Index, target: Int) : Index {
+    var s = start
+    var e = end
+
+    while(s<e) {
+        var mid = (s+e) shr 1
+
+        if(mid==e) return e
+
+        if(list.get(mid) < target) s = mid+1
+        else e = mid
+    }
+    return s
+}
 
 val tools = mutableListOf<String>()
 val jobGroup= mutableListOf<String>()
