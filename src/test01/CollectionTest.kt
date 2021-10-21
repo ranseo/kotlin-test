@@ -5,7 +5,11 @@ fun List<String>.getShortWordsTo(shortWords: MutableList<String>, maxLength: Int
     println(this[1])
     val articles = setOf("a", "A", "an", "An", "the", "The")
     shortWords -= articles
+
+
 }
+
+
 
 fun main() {
 
@@ -15,4 +19,17 @@ fun main() {
     words.getShortWordsTo(shortWords, 3)
     println(shortWords)
     //println(words-articles)
+
+    val list = arrayListOf<Int>(0,1,2,3)
+
+    list.drop(1)
+
+    list.remove(0)
+    for (i in list) {
+        print(i)
+
+    }
+    println()
+
+
 }

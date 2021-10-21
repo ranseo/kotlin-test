@@ -1,41 +1,71 @@
 package programmers
 
+import java.util.*
+
 class SolutionFindLyrics {
     fun solution(words: Array<String>, queries: Array<String>): List<Int> {
 
         var answer = mutableListOf<Int>()
-        //arr은 word를 length별로 구분하여 저장하기 위한 배열
-        var arr = Array(10_000 + 1) { mutableSetOf<String>() }
 
-        //words를 각 word의 length로 구분. -> array<MutableList<String>>[idx] 배열에 추가.
-        words.map {
-            val idx = it.length
-            arr[idx].add(it)
+        val trie: MutableMap<Int, Trie> = mutableMapOf()
+        val reverseTrie: MutableMap<Int, Trie> = mutableMapOf()
+
+        for (word in words) {
+            val idx = word.length
+            trie[idx]?.addNode(word) ?: trie.put(idx, Trie().also { it.addNode(word)})
+            reverseTrie[idx]?.addNode(word.reversed()) ?: reverseTrie.put(idx, Trie().also { it.addNode(word.reversed())})
         }
-        //queries의 원소의 length를 idx로 해당 단어들의 배열을 탐색.
-        queries.map { q ->
-            var list = listOf<String>()
-            var cnt = 0
-            val idx = q.length
-            var pre = false
-            if (q[0] == '?') pre = true // else suffix = true
-
-            val tmp = q.replace(Regex("[?]+"), "")
-            val len = tmp.length
 
 
-            if(!pre) {
-                list = arr[idx].groupBy { it.startsWith(tmp)}[true] ?: listOf()
+        for (query in queries) {
+            val idx = query.length
+            val new = query.replace(Regex("[?]+"), "")
+
+            if (new.length == 0) {
+                answer.add(trie[idx]?.rootNode?.count ?: 0)
+            } else if (query[0] == '?') {
+                answer.add(reverseTrie[idx]?.let { it.getNode(new.reversed())?.count ?: 0} ?:0)
             } else {
-                list = arr[idx].groupBy { it.endsWith(tmp)}[true] ?: listOf()
+                answer.add(trie[idx]?.let{ it.getNode(new)?.count ?: 0} ?: 0)
             }
-
-            cnt = list.size
-
-            answer.add(cnt)
         }
 
         return answer
+    }
+
+    class TrieNode {
+       
+        val childNode: MutableMap<Char, TrieNode> = mutableMapOf()
+        var count: Int = 1
+    }
+
+    class Trie {
+        val rootNode = TrieNode()
+
+        init {
+            this.rootNode.count = 0
+        }
+
+        fun addNode(word: String) {
+            var tempNode = this.rootNode
+            rootNode.count++
+
+            for (char in word) {
+                val tempChildNode = tempNode.childNode[char]
+                tempNode = tempChildNode?.apply { count++ } ?: tempNode.childNode.computeIfAbsent(char) { TrieNode() }
+            }
+        }
+
+        fun getNode(word: String): TrieNode? {
+            var tempNode = this.rootNode
+
+            for (char in word) {
+                val node = tempNode.childNode[char] ?: return null
+                tempNode = node
+            }
+
+            return tempNode
+        }
     }
 }
 
