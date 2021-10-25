@@ -31,5 +31,17 @@ fun main() {
     }
     println()
 
+    val longWord = mutableListOf<Int>(1,23,3,4,5,)
+    longWord.removeAt(0)
+
+    println(longWord)
+
+    longWord.map{
+        if(it==3)
+        println(it)
+    }
+
+    println("asdasd")
+
 
 }
