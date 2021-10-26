@@ -97,3 +97,88 @@ fun main() {
 
     println(solutionInpsection.solution(n,weak2,dist2))
 }
+
+class SolutionInspection2 {
+    var wallSize = 0
+    var weakSize = 0
+    var distSize = 0
+    var INF = 123_456_789
+    var answer = INF
+    fun solution(n: Int, weak: IntArray, dist: IntArray): Int {
+
+
+        wallSize = n
+        weakSize = weak.size
+        distSize = dist.size
+
+        //n은 외벽의 길이 (1~200)
+        //weak은 사이즈 = (1~15), 오름차순 정렬 - 취약지점으로 친구들이 들러야 할 방문점. n으로부터 떨어진 거리로 표시
+        //dist 는 각 친구들이 이동할 수 있는 거리, 사이즈 = (1~8), 1에서 100이하의 원소
+
+        //해야할 것, dist를 내림차순 정렬하고, 첫번째 원소부터 모든 취약지점을 돌아다녔을 때 최소의 수 = 1 이 나오는 지 검사.
+        dist.sortDescending()
+
+        val tmpWeak = weak.toMutableList()
+        val tmpDist = dist.toMutableList()
+        //확인해볼 수 있는 루트 찾기.
+        checkWall(tmpWeak,tmpDist)
+        if(answer == 1) return answer
+
+        //친구들의 순서를 순열로 번갈아 루트 찾기.
+        permutation(tmpWeak, tmpDist, mutableListOf(), Array<Boolean>(distSize+1){false})
+
+
+
+        return if(answer>100) -1 else answer
+    }
+
+    fun permutation(weakSite: MutableList<Int>, dist_fix: MutableList<Int>, dist_target: MutableList<Int>, visit: Array<Boolean>) {
+        if(distSize == dist_target.size) {
+            checkWall(weakSite, dist_target)
+        }
+
+        for(i in 0 until distSize) {
+            if(visit[i]) continue
+
+            dist_target.add(dist_fix[i])
+            visit[i] = true
+
+            permutation(weakSite, dist_fix, dist_target, visit)
+
+            visit[i] = false
+            dist_target.removeAt(dist_target.size-1)
+
+
+        }
+    }
+
+    fun checkWall(weakSite: MutableList<Int>, distance: MutableList<Int>) {
+        var tmpWeak = weakSite.toMutableList()
+
+        for(a in 0 until weakSize) {
+            var Min = INF
+            var success = false
+            var tmpDist = distance.toMutableList()
+            //end변수는 친구가 취약지점에서 시작해 갈 수 있는 최대 거리를 의미
+            var end = tmpDist[0] + tmpWeak[0]
+            tmpDist.removeAt(0)
+
+            tmpWeak.mapIndexed{i,v ->
+                if(end < v) {
+                    if(tmpDist.isEmpty()) return@mapIndexed
+                    end = tmpDist[0] + v
+                    tmpDist.removeAt(0)
+                }
+                if(i== weakSize-1 && end >= v) success = true
+            }
+            if(success) Min = distSize - tmpDist.size
+            answer = Math.min(answer , Min)
+
+            if(answer == 1) return
+
+            val tmp = tmpWeak[0] + wallSize
+            tmpWeak.removeAt(0)
+            tmpWeak.add(tmp)
+        }
+    }
+}

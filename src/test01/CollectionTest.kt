@@ -31,7 +31,37 @@ fun main() {
     }
     println()
 
-    list.mapIndexed{i,v -> return@mapIndexed}
+    val longWord = mutableListOf<Int>(1,23,3,4,5,)
+    longWord.removeAt(0)
 
+    println(longWord)
+
+    longWord.map{
+        if(it==3)
+        println(it)
+    }
+
+    println("asdasd")
+
+
+    val arrayLis = arrayListOf<List<Int>>()
+
+    val a = mutableListOf<Int>()
+
+    arrayLis.add(a)
+
+    val b = arrayLis.first()
+
+
+    val arrayLis2 = arrayListOf<MutableList<Int>>()
+
+    val c = listOf<Int>()
+
+    arrayLis2.add(c.toMutableList())
+
+
+    val list100 = listOf(1,4,3).sorted()
+
+    println(list100)
 
 }
