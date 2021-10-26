@@ -31,5 +31,7 @@ fun main() {
     }
     println()
 
+    list.mapIndexed{i,v -> return@mapIndexed}
+
 
 }

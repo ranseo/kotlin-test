@@ -22,15 +22,15 @@ class SolutionLockAndKeys {
         for(i in 0 until 4) {
             keyName = ""
             move(keys,P(0,0))
-            println("move : 현재")
-            println(keyName)
+//            println("move : 현재")
+//            println(keyName)
             hashKey.put(keyName, true)
             dfs(keys,lock,lock.size, holl)
             if(flag) return true
             rotate(keys, keys.size)
-            println()
-            println("Rotate!")
-            println()
+//            println()
+//            println("Rotate!")
+//            println()
 
         }
 
