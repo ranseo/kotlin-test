@@ -44,4 +44,24 @@ fun main() {
     println("asdasd")
 
 
+    val arrayLis = arrayListOf<List<Int>>()
+
+    val a = mutableListOf<Int>()
+
+    arrayLis.add(a)
+
+    val b = arrayLis.first()
+
+
+    val arrayLis2 = arrayListOf<MutableList<Int>>()
+
+    val c = listOf<Int>()
+
+    arrayLis2.add(c.toMutableList())
+
+
+    val list100 = listOf(1,4,3).sorted()
+
+    println(list100)
+
 }
