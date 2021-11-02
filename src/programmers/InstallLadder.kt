@@ -8,9 +8,9 @@ class SolutionInstallLadder {
     val move = arrayOf(P1(0,1), P1(0,-1), P(1,0), P(-1,0))
 
     val INF = 123_456_789
-
-    var group : Array<Array<Int>> = arrayOf()
     var visit : Array<Array<Boolean>> = arrayOf()
+    var group : Array<Array<Int>> = arrayOf()
+    var groupVisit : Array<Boolean> = arrayOf()
     var hashMap = hashMapOf<String, Boolean>()
     var N = 0
     var ladder = 0
@@ -23,7 +23,8 @@ class SolutionInstallLadder {
         N = land.size
 
         group = Array(N){Array(N){0}}
-        visit = Array(N+1){Array(N+1){false}}
+        groupVisit = Array(N+1){false}
+        visit = Array(N){Array(N){false}}
 
         var groupNum = 1
         for(i in 0 until N) {
@@ -36,7 +37,7 @@ class SolutionInstallLadder {
         }
 
 
-        group.map { v->v.map { print("$it ") }; println() }
+        //group.map { v->v.map { print("$it ") }; println() }
 
         ladder = groupNum-1
 
@@ -91,6 +92,8 @@ class SolutionInstallLadder {
     }
 
     fun putLadder(land:Array<IntArray>, groupNum: Int) : Int {
+        if(groupVisit[groupNum]) return 0
+
         var Min = INF
         var ladderIdx = Array(2){P1(0,0)}
         group.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
@@ -102,12 +105,15 @@ class SolutionInstallLadder {
                     val next = s.plus(move[i])
                     val (n_x, n_y) = next
 
-                    if(!isLand(n_x,n_y) || group[n_x][n_y] <= groupNum) continue
+
+                    if(!isLand(n_x,n_y) || group[n_x][n_y] == groupNum) continue
+
+
                     val tmp = Min
                     Min = Math.min(Min, (land[s_x][s_y] - land[n_x][n_y]).absoluteValue)
                     if(tmp != Min) {
-                        ladderIdx[0] = P1(n_x,n_y)
-                        ladderIdx[1] = P1(s_x,s_y)
+                        ladderIdx[0] = P1(s_x,s_y)
+                        ladderIdx[1] = P1(n_x,n_y)
                     }
                 }
             }
@@ -119,7 +125,11 @@ class SolutionInstallLadder {
 
         if(!hashMap.containsKey(key)) {
             hashMap.put(key, true)
-            println("groupNum : ${groupNum}, Min : ${Min}, key : $key")
+            //println("groupNum : ${groupNum}, Min : ${Min}, key : $key")
+
+            groupVisit[group[ladderIdx[0].first][ladderIdx[0].second]] = true
+            groupVisit[group[ladderIdx[1].first][ladderIdx[1].second]] = true
+
             return Min
         }
 
@@ -136,5 +146,5 @@ fun main() {
     val arr2 = arrayOf(intArrayOf(10,11,10,11), intArrayOf(2,21,20,10), intArrayOf(1,20,21,11), intArrayOf(2,1,2,1))
     val height = 3
 
-    println(solution.solution(arr2,1))
+    println(solution.solution(arr,height))
 }
