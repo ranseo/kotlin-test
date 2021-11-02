@@ -1,8 +1,10 @@
 package programmers
 
+import test01.UnionFind
 import kotlin.math.absoluteValue
 
 typealias P1 = Pair<Int,Int>
+
 class SolutionInstallLadder {
     //오른쪽,왼쪽,아래쪽,위쪽
     val move = arrayOf(P1(0,1), P1(0,-1), P(1,0), P(-1,0))
@@ -11,7 +13,8 @@ class SolutionInstallLadder {
     var visit : Array<Array<Boolean>> = arrayOf()
     var group : Array<Array<Int>> = arrayOf()
     var groupVisit : Array<Boolean> = arrayOf()
-    var hashMap = hashMapOf<String, Boolean>()
+
+
     var N = 0
     var ladder = 0
 
@@ -19,11 +22,11 @@ class SolutionInstallLadder {
 
 
     fun solution(land: Array<IntArray>, height: Int): Int {
-        var answer = 0
         N = land.size
+        val graph = mutableListOf<Edge>()
 
         group = Array(N){Array(N){0}}
-        groupVisit = Array(N+1){false}
+
         visit = Array(N){Array(N){false}}
 
         var groupNum = 1
@@ -41,9 +44,14 @@ class SolutionInstallLadder {
 
         ladder = groupNum-1
 
+        groupVisit = Array(N*N+1){false}
         for(i in 1..ladder) {
-            answer += putLadder(land, i)
+            findLadder(land, graph ,i)
         }
+
+        graph.sort()
+
+        graph.map { println("${it.node[0]}, ${it.node[1]} and ${it.dist}")}
 
 
         //1.BFS로 이중배열 탐색. -> 각 그룹의 번호를 매긴다.- 그룹번호의 시작 좌표를 기록.
@@ -55,7 +63,8 @@ class SolutionInstallLadder {
         //필요한 자료구조.
 
 
-        return answer
+        return Kruskal_custom(graph,N)
+
     }
 
     fun BFS(land:Array<IntArray>, height: Int, start:P1, groupNum:Int) {
@@ -91,53 +100,86 @@ class SolutionInstallLadder {
 
     }
 
-    fun putLadder(land:Array<IntArray>, groupNum: Int) : Int {
-        if(groupVisit[groupNum]) return 0
+    fun findLadder(land:Array<IntArray>, graph: MutableList<Edge>, groupNum: Int)  {
+        if(groupVisit[groupNum]) return
 
         var Min = INF
-        var ladderIdx = Array(2){P1(0,0)}
+        var ladderIdx = Array(2){0}
+        var distance = 0
         group.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
             if(elem == groupNum){
                 val s = P1(i,j)
                 val (s_x,s_y) = s
 
                 for(i in 0 until 4) {
-                    val next = s.plus(move[i])
-                    val (n_x, n_y) = next
+                    val n = s.plus(move[i])
+                    val (n_x, n_y) = n
 
 
                     if(!isLand(n_x,n_y) || group[n_x][n_y] == groupNum) continue
+                    //if(groupVisit[groupNum] || groupVisit[group[n_x][n_y]] ) continue
 
-
+                    val dist = Math.abs(land[s_x][s_y] - land[n_x][n_y])
                     val tmp = Min
-                    Min = Math.min(Min, (land[s_x][s_y] - land[n_x][n_y]).absoluteValue)
+                    Min = Math.min(Min, dist)
                     if(tmp != Min) {
-                        ladderIdx[0] = P1(s_x,s_y)
-                        ladderIdx[1] = P1(n_x,n_y)
+                        ladderIdx[0] = groupNum
+                        ladderIdx[1] = group[n_x][n_y]
+                        distance = dist
                     }
                 }
             }
         }}
 
-        if(Min == INF) return 0
+        graph.add(Edge(ladderIdx[0],ladderIdx[1],distance))
 
-        val key = "${ladderIdx[0]}, ${ladderIdx[1]}"
+        groupVisit[ladderIdx[0]] = true
+        groupVisit[ladderIdx[1]] = true
+    }
 
-        if(!hashMap.containsKey(key)) {
-            hashMap.put(key, true)
-            //println("groupNum : ${groupNum}, Min : ${Min}, key : $key")
+    fun Kruskal_custom(graph:List<Edge>, size:Int) : Int {
+        var sum = 0
+        val n = size * size
+        val rootParent = Array(n+1){0}
+        for(i in 1..n) rootParent[i] = i
 
-            groupVisit[group[ladderIdx[0].first][ladderIdx[0].second]] = true
-            groupVisit[group[ladderIdx[1].first][ladderIdx[1].second]] = true
+        val uf = UnionFind()
 
-            return Min
+        for(i in 0 until graph.size) {
+            val x = graph[i].node[0]
+            val y = graph[i].node[1]
+            val dist = graph[i].dist
+
+            if(!uf.findParent(rootParent,x,y)) {
+                sum += dist
+                uf.unionParent(rootParent,x,y)
+            }
         }
 
-        return 0
+        return sum
     }
+
+    fun getNode(_p:P1, size:Int) : Int {
+        val (x,y) = _p.plus(P1(1,1))
+        return (x*size) - (size-y)
+    }
+
     fun isLand(x:Int, y:Int) : Boolean = !(x<0 || y<0 || x>=N || y>=N)
 
 
+}
+
+class Edge(a:Int, b:Int, _dist:Int) : Comparable<Edge> {
+    val node = Array(2){0}
+    var dist = 0
+
+    init {
+        node[0] = a
+        node[1] = b
+        dist = _dist
+    }
+
+    override fun compareTo(other: Edge): Int = this.dist - other.dist
 }
 
 fun main() {
