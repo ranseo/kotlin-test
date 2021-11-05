@@ -19,7 +19,6 @@ class UnionFind{
 
         if(a<b) parent[b] = a
         else parent[a] = b
-
     }
 }
 

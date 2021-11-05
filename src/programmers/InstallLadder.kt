@@ -7,13 +7,11 @@ typealias P1 = Pair<Int,Int>
 
 class SolutionInstallLadder {
     //오른쪽,왼쪽,아래쪽,위쪽
-    val move = arrayOf(P1(0,1), P1(0,-1), P(1,0), P(-1,0))
+    val move = arrayOf(P1(0,1), P1(0,-1), P1(1,0), P1(-1,0))
+    var visit : Array<Array<Int>> = arrayOf()
 
-    val INF = 123_456_789
-    var visit : Array<Array<Boolean>> = arrayOf()
-    var group : Array<Array<Int>> = arrayOf()
-    var groupVisit : Array<Boolean> = arrayOf()
-
+    //groupNumber가 key가 되고, mutableList에 좌표를 집어넣는 형식. -> 시간초과 해결하기 위해서
+    val hashMap : HashMap<Int,MutableList<P1>> = hashMapOf()
 
     var N = 0
     var ladder = 0
@@ -25,14 +23,12 @@ class SolutionInstallLadder {
         N = land.size
         val graph = mutableListOf<Edge>()
 
-        group = Array(N){Array(N){0}}
-
-        visit = Array(N){Array(N){false}}
+        visit = Array(N){Array(N){0}}
 
         var groupNum = 1
         for(i in 0 until N) {
             for(j in 0 until N) {
-                if(visit[i][j]) continue
+                if(visit[i][j]>0) continue
                 BFS(land,height, P1(i,j), groupNum)
                 groupNum++
             }
@@ -44,7 +40,6 @@ class SolutionInstallLadder {
 
         ladder = groupNum-1
 
-        groupVisit = Array(N*N+1){false}
         for(i in 1..ladder) {
             findLadder(land, graph ,i)
         }
@@ -72,9 +67,8 @@ class SolutionInstallLadder {
         var s = start
         var (x,y) = s
 
-        visit[x][y] = true
+        visit[x][y] = groupNum
         q.add(s)
-        group[x][y] = groupNum
 
         while(!q.isEmpty()) {
             s = q[0]
@@ -88,59 +82,77 @@ class SolutionInstallLadder {
 
                 if(!isLand(n_x,n_y)) continue
 
-                val interval = (land[s_x][s_y] - land[n_x][n_y]).absoluteValue
+                //val interval = (land[s_x][s_y] - land[n_x][n_y]).absoluteValue
+                val interval = Math.abs(land[s_x][s_y] - land[n_x][n_y])
 
-                if(visit[n_x][n_y] || interval > height) continue
+                if(visit[n_x][n_y] > 0 || interval > height) continue
 
-                visit[n_x][n_y] = true
+                visit[n_x][n_y] = groupNum
                 q.add(next)
-                group[n_x][n_y] = groupNum
+
+                hashMap[groupNum]?.add(P1(n_x,n_y)) ?: hashMap.put(groupNum, mutableListOf())?.add(P1(n_x,n_y))
             }
         }
-
     }
 
     fun findLadder(land:Array<IntArray>, graph: MutableList<Edge>, groupNum: Int)  {
-        if(groupVisit[groupNum]) return
 
-        var Min = INF
-        var ladderIdx = Array(2){0}
-        var distance = 0
-        group.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
+        val groupVisit = hashMap[groupNum] ?: return
+
+        groupVisit.forEach { s->
+            val (s_x,s_y) = s
+            val s_g = groupNum
+
+            for(i in 0 until 4) {
+                val n = s.plus(move[i])
+                val (n_x, n_y) = n
+
+
+                if(!isLand(n_x,n_y) || visit[n_x][n_y] <= s_g) continue
+
+                //nextGroup
+                val n_g = visit[n_x][n_y]
+                val dist = Math.abs(land[s_x][s_y] - land[n_x][n_y])
+
+                graph.add(Edge(s_g,n_g,dist))
+            }
+        }
+
+        visit.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
             if(elem == groupNum){
                 val s = P1(i,j)
                 val (s_x,s_y) = s
+                val s_g = groupNum
 
                 for(i in 0 until 4) {
                     val n = s.plus(move[i])
                     val (n_x, n_y) = n
 
 
-                    if(!isLand(n_x,n_y) || group[n_x][n_y] == groupNum) continue
-                    //if(groupVisit[groupNum] || groupVisit[group[n_x][n_y]] ) continue
-
+                    if(!isLand(n_x,n_y) || visit[n_x][n_y] <= s_g) continue
+                    //nextGroup
+                    val n_g = visit[n_x][n_y]
                     val dist = Math.abs(land[s_x][s_y] - land[n_x][n_y])
-                    val tmp = Min
-                    Min = Math.min(Min, dist)
-                    if(tmp != Min) {
-                        ladderIdx[0] = groupNum
-                        ladderIdx[1] = group[n_x][n_y]
-                        distance = dist
-                    }
+
+                    graph.add(Edge(s_g,n_g,dist))
                 }
             }
         }}
+    }
 
-        graph.add(Edge(ladderIdx[0],ladderIdx[1],distance))
 
-        groupVisit[ladderIdx[0]] = true
-        groupVisit[ladderIdx[1]] = true
+    fun findLadder2 (land:Array<IntArray>, graph: MutableList<Edge>, groupNum: Int)  {
+       visit.map { it.filter { v -> v == groupNum }}
+
+
     }
 
     fun Kruskal_custom(graph:List<Edge>, size:Int) : Int {
         var sum = 0
         val n = size * size
         val rootParent = Array(n+1){0}
+        val groupVisit = Array(n+1){false}
+
         for(i in 1..n) rootParent[i] = i
 
         val uf = UnionFind()
@@ -149,19 +161,17 @@ class SolutionInstallLadder {
             val x = graph[i].node[0]
             val y = graph[i].node[1]
             val dist = graph[i].dist
+            if(groupVisit[x] && groupVisit[y]) continue
 
             if(!uf.findParent(rootParent,x,y)) {
                 sum += dist
                 uf.unionParent(rootParent,x,y)
+                groupVisit[x] = true
+                groupVisit[y] = true
             }
         }
 
         return sum
-    }
-
-    fun getNode(_p:P1, size:Int) : Int {
-        val (x,y) = _p.plus(P1(1,1))
-        return (x*size) - (size-y)
     }
 
     fun isLand(x:Int, y:Int) : Boolean = !(x<0 || y<0 || x>=N || y>=N)
@@ -188,5 +198,9 @@ fun main() {
     val arr2 = arrayOf(intArrayOf(10,11,10,11), intArrayOf(2,21,20,10), intArrayOf(1,20,21,11), intArrayOf(2,1,2,1))
     val height = 3
 
-    println(solution.solution(arr,height))
+    println(solution.solution(arr2,1))
 }
+
+
+//노드 1, 2 사이에 수많은 WEIGHT를 가진 간선이 있다고 생각하고, 다 넣어버리자.
+//그리고 그룹을 edge로 list에 add할 때 자신의 그룹번호보다는 낮은 그룹번호는 무시하도록. - 이미 이 전에 추가가 되었기 때문.
