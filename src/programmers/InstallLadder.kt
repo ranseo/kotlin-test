@@ -46,7 +46,7 @@ class SolutionInstallLadder {
 
         graph.sort()
 
-        graph.map { println("${it.node[0]}, ${it.node[1]} and ${it.dist}")}
+        //graph.map { println("${it.node[0]}, ${it.node[1]} and ${it.dist}")}
 
 
         //1.BFS로 이중배열 탐색. -> 각 그룹의 번호를 매긴다.- 그룹번호의 시작 좌표를 기록.
@@ -68,6 +68,8 @@ class SolutionInstallLadder {
         var (x,y) = s
 
         visit[x][y] = groupNum
+        //println("BFS X : $x, Y : $y")
+        hashMap.put(groupNum, mutableListOf<P1>().also { it.add(s) })
         q.add(s)
 
         while(!q.isEmpty()) {
@@ -90,7 +92,7 @@ class SolutionInstallLadder {
                 visit[n_x][n_y] = groupNum
                 q.add(next)
 
-                hashMap[groupNum]?.add(P1(n_x,n_y)) ?: hashMap.put(groupNum, mutableListOf())?.add(P1(n_x,n_y))
+                hashMap[groupNum]?.add(next) ?: hashMap.put(groupNum, mutableListOf<P1>().also { it.add(next)})
             }
         }
     }
@@ -98,6 +100,8 @@ class SolutionInstallLadder {
     fun findLadder(land:Array<IntArray>, graph: MutableList<Edge>, groupNum: Int)  {
 
         val groupVisit = hashMap[groupNum] ?: return
+
+        //println(groupVisit)
 
         groupVisit.forEach { s->
             val (s_x,s_y) = s
@@ -118,32 +122,26 @@ class SolutionInstallLadder {
             }
         }
 
-        visit.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
-            if(elem == groupNum){
-                val s = P1(i,j)
-                val (s_x,s_y) = s
-                val s_g = groupNum
-
-                for(i in 0 until 4) {
-                    val n = s.plus(move[i])
-                    val (n_x, n_y) = n
-
-
-                    if(!isLand(n_x,n_y) || visit[n_x][n_y] <= s_g) continue
-                    //nextGroup
-                    val n_g = visit[n_x][n_y]
-                    val dist = Math.abs(land[s_x][s_y] - land[n_x][n_y])
-
-                    graph.add(Edge(s_g,n_g,dist))
-                }
-            }
-        }}
-    }
-
-
-    fun findLadder2 (land:Array<IntArray>, graph: MutableList<Edge>, groupNum: Int)  {
-       visit.map { it.filter { v -> v == groupNum }}
-
+//        visit.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
+//            if(elem == groupNum){
+//                val s = P1(i,j)
+//                val (s_x,s_y) = s
+//                val s_g = groupNum
+//
+//                for(i in 0 until 4) {
+//                    val n = s.plus(move[i])
+//                    val (n_x, n_y) = n
+//
+//
+//                    if(!isLand(n_x,n_y) || visit[n_x][n_y] <= s_g) continue
+//                    //nextGroup
+//                    val n_g = visit[n_x][n_y]
+//                    val dist = Math.abs(land[s_x][s_y] - land[n_x][n_y])
+//
+//                    graph.add(Edge(s_g,n_g,dist))
+//                }
+//            }
+//        }}
 
     }
 
@@ -161,13 +159,10 @@ class SolutionInstallLadder {
             val x = graph[i].node[0]
             val y = graph[i].node[1]
             val dist = graph[i].dist
-            if(groupVisit[x] && groupVisit[y]) continue
 
             if(!uf.findParent(rootParent,x,y)) {
                 sum += dist
                 uf.unionParent(rootParent,x,y)
-                groupVisit[x] = true
-                groupVisit[y] = true
             }
         }
 
