@@ -35,9 +35,6 @@ class SolutionInstallLadder {
 
         }
 
-
-        //group.map { v->v.map { print("$it ") }; println() }
-
         ladder = groupNum-1
 
         for(i in 1..ladder) {
@@ -45,18 +42,6 @@ class SolutionInstallLadder {
         }
 
         graph.sort()
-
-        //graph.map { println("${it.node[0]}, ${it.node[1]} and ${it.dist}")}
-
-
-        //1.BFS로 이중배열 탐색. -> 각 그룹의 번호를 매긴다.- 그룹번호의 시작 좌표를 기록.
-        //2.BFS가 끝나면 번호별로 탐색.
-
-        //2번 탐색 시, 다른 번호와 접촉 후 두 층의 차이를 Min변수에 기록한다. 그리고 해당 idx와 다른 idx를 기록한다 Pair -> 탐색이 끝나면 가장 작은 Min을 가진 idx와 idx를 사다리로 연결되어있음을 확인한다.
-        //탐색이 끝나면 다음 그룹 번호부터 탐색.
-
-        //필요한 자료구조.
-
 
         return Kruskal_custom(graph,N)
 
@@ -121,28 +106,6 @@ class SolutionInstallLadder {
                 graph.add(Edge(s_g,n_g,dist))
             }
         }
-
-//        visit.mapIndexed{ i,v-> v.mapIndexed { j,elem ->
-//            if(elem == groupNum){
-//                val s = P1(i,j)
-//                val (s_x,s_y) = s
-//                val s_g = groupNum
-//
-//                for(i in 0 until 4) {
-//                    val n = s.plus(move[i])
-//                    val (n_x, n_y) = n
-//
-//
-//                    if(!isLand(n_x,n_y) || visit[n_x][n_y] <= s_g) continue
-//                    //nextGroup
-//                    val n_g = visit[n_x][n_y]
-//                    val dist = Math.abs(land[s_x][s_y] - land[n_x][n_y])
-//
-//                    graph.add(Edge(s_g,n_g,dist))
-//                }
-//            }
-//        }}
-
     }
 
     fun Kruskal_custom(graph:List<Edge>, size:Int) : Int {
@@ -195,6 +158,8 @@ fun main() {
 
     println(solution.solution(arr2,1))
 }
+
+
 
 
 //노드 1, 2 사이에 수많은 WEIGHT를 가진 간선이 있다고 생각하고, 다 넣어버리자.
