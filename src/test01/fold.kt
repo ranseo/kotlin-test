@@ -3,7 +3,13 @@ package test01
 fun main() {
 
 
-    var str = "(())"
+
+    var str = "(())()"
+
+    val tmp = str.fold(""){acc,i -> acc+i }
+
+
+    println(tmp)
 
     val number = listOf(1,2,3,4,5)
 
