@@ -4,9 +4,20 @@ fun main() {
 
 
 
-    var str = "(())()"
+    var str = "123456789"
 
-    val tmp = str.fold(""){acc,i -> acc+i }
+    val tmp = str.foldIndexed(""){i,acc,c ->
+        //cmp를
+        if((i+1)%3==0) {
+            val tmp = acc+c
+            println(" acc before i%2 : $tmp")
+            acc.drop(acc.length)
+        }
+        else {
+            println("acc before else : $acc")
+            acc+c
+        }
+    }
 
 
     println(tmp)

@@ -113,3 +113,62 @@ class SolutionZipString2 {
         return answer
     }
 }
+
+
+
+//fold를 이용한 zipString
+class SolutionZipString3 {
+
+    val INF = 123_456_789
+
+    fun solution(s: String): Int {
+        var answer = INF
+
+        //s의 길이만큼 for문을 돌린다. : 그래야 s를 idx만큼 잘라서 다음 s(by idx)와 비교해볼 수 있다.
+        for(idx in 1..s.length) {
+            //1.s를 fold로 비교
+            var new = ""
+            var count = 0
+            var cmp = s.substring(0 until idx)
+
+            s.foldIndexed(""){i,acc,c ->
+                // i+1 == s.length는 s의 i가 마지막까지 왔을 때 처리하기 위한 조건문. (idx가 남은 인덱스보다 큰 경우에는 문자열을 자르지 못하기에 그 부분을 처리;)
+                if((i+1)%idx == 0 || i+1 == s.length) {
+                    //tmp는 현재 인덱스의 내용물까지 포함한 acc : 현재 인덱스를 포함하려면 acc에 c를 더해줘야 함.
+                    val tmp = acc+c
+                    //cmp와 tmp를 비교했을 때, 같다면 count를 증가시킨다. 그리고 acc는 그대로 둔다.
+                    //같지 않다면 현재 카운트(toString)과 현재 cmp를 new에 저장하고, cmp를 tmp로 교체, acc는 ""로 초기화, count를 1로 초기화한다.
+                    if(cmp == tmp) {
+                        count++
+                        if(i+1 == s.length) new += cmp + if(count>1) count.toString() else ""
+
+                    } else {
+                        //count가 1이라면 줄일 수 없음으로 1은 생략한다.
+                        //else 구문 ..와 괄호때문에 틀렷네..
+                        new += (if(i+1 == s.length) cmp + tmp else cmp) + if(count>1) count.toString() else ""
+                        cmp = tmp
+                        count = 1
+                    }
+                    acc.drop(acc.length)
+                } else acc+c
+            }
+
+            println("new : $new")
+            answer = Math.min(answer, new.length)
+        }
+
+
+        return answer
+    }
+}
+
+fun main() {
+    val solutionZipString = SolutionZipString3()
+    val str = "acacacacacacbacacacacacac"
+
+    val ans = solutionZipString.solution(str)
+
+    println(ans)
+
+}
+
