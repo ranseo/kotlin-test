@@ -1,5 +1,7 @@
 package test01
 
+import java.util.*
+
 data class Test(val data:String, val name: String, val idx: Int=0)
 
 fun main() {
@@ -8,10 +10,21 @@ fun main() {
 
 
 
+
     val list = mutableListOf<Test>(test1, test2)
+    println(list)
+
+    list.sortWith(compTest)
+
+    println(list)
 
 }
 
-val compTest : Comparator<Test> = Comparator<Test>(){
+object compTest : Comparator<Test> {
+    override fun compare(o1: Test?, o2: Test?): Int {
 
+        return -((o1?.idx ?:0) - (o2?.idx ?:0))
+    }
 }
+
+
