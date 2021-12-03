@@ -24,6 +24,11 @@ fun main() {
 
     val number = listOf(1,2,3,4,5)
 
+    number.fold(0) { acc, i ->
+        if (acc == 0) i
+        else acc
+    }
+
     val relation = arrayOf("a", "b", "c", "d", "e")
 
     val new = number.fold(""){acc,i -> acc + relation[i-1]}
