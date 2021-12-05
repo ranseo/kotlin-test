@@ -103,18 +103,63 @@ class SolutionJoyStick {
     }
 }
 
-fun main() {
-    val solutionJoyStick = SolutionJoyStick()
+class SolutionJoyStick2 {
+    fun solution(name:String) :Int {
+        var answer = 0
 
-    //11번
-    println(solutionJoyStick.solution("JAN"))
+        //name의 각 철자들이 되려면 'A'로 부터 [위, 아래] 중 어느 방향으로 움직여야 더 가깝게 이동할 수 있는지 체크하고, answer에 더해줌
+        for(i in name.indices) {
+            val char = name[i]
+            //'A'에서 char까지 걸리는 거리 = char - 'A'
+            //'A'에서 거꾸로 돌아 'Z'로 간다음 char까지 걸리는 거리 = 'Z' - char + 1 (+1은 'A'에서 'Z'로 한 번 이동한 거리)
+            if(char == 'A') continue
+            answer += if(char - 'A' > 'Z' - char + 1) 'Z' - char + 1 else char - 'A'
+        }
+
+        //만약 단순히 [오른쪽]으로만 이동했다면 이동 거리는 name의 길이가 된다.
+        var Min = name.length-1
+
+        // [오른쪽] 으로 이동하다가 '연속되는 A'가 있어서 (낭비되는 동선) [왼쪽]으로 이동했을 시, 이동거리를 구한다.
+        var start = 0
+
+        while(start<name.length) {
+            var idx = start
+            if(name[idx]=='A') {
+                while(idx<name.length && name[idx]=='A') idx++
+
+                //start-1 : 'A'를 발견한 위치에서 뒤로 한칸 = 0에서 'A'까지의 거리
+                //(start-1)*2 : 0에서 start-1 까지 왔다가, 다시 0으로 돌아간 거리.
+                //(name.length-1) - idx : name의 끝 인덱스에서 start지점에서 연속된 'A'문자열의 마지막 인덱스를 뺀다. = 0에서 거꾸로 돌아서 이동한 거리.
+
+                //+ 만약 idx가 name.length와 같다면 - 뒤로 돌아갈 필요가 없다.
+                if(idx == name.length) Min = Math.min(Min, start-1)
+                else {
+                    var tmp = (start-1)*2 + (name.length-1) - (idx-1)
+                    Min = Math.min(Min, tmp)
+                }
+
+                start = idx
+            } else start++
+        }
+
+
+        answer += Min
+        return answer
+    }
 }
 
-class SolutionJoyStickTest2 {
+fun main() {
+    val solutionJoyStick = SolutionJoyStick2()
+
+    //11번
+    println(solutionJoyStick.solution("BBAAAA"))
+}
+
+class SolutionJoyStickTest {
     fun solution(name: String): Int {
         var answer = 0
         var exp = name.length - 1
-        for (i in 0 until name.length) {
+        for (i in name.indices) {
             val c = name[i]
             answer += if ('Z' - c + 1 > c - 'A') c - 'A' else 'Z' - c + 1
             if (c == 'A') {
