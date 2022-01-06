@@ -8,11 +8,7 @@ fun main() {
 
     val list = mutableListOf<P3>(P3(1,1), P3(2,4), P3(2,5))
 
-    println(intarray.maxByOrNull { it.seconds })
 
 
-}
-
-fun MutableList<Int>.initList() {
 
 }

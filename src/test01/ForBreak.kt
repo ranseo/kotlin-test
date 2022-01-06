@@ -10,4 +10,13 @@ fun main() {
     val list = Array(3){Array(3){Array(2){false} } }
 
 
+    val mlist = mutableListOf<Int>()
+
+    for(i in mlist) {
+
+    }
+
+    Int.MAX_VALUE
+
+
 }

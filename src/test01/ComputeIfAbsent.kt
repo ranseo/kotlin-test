@@ -6,8 +6,9 @@ fun main() {
     val map3 = mutableMapOf<String, Boolean>()
 
     map2.put(3, mutableListOf(7))
-    map2[3]?.add(5) ?: map2.computeIfAbsent(3) { mutableListOf<Int>().also { it.add(5)}}
+    map2[3]?.add(5) ?: map2.computeIfAbsent(3) { mutableListOf<Int>(5).also { it.add(5)}}
 
+    map2.computeIfAbsent(3){mutableListOf<Int>()}.add(5)
 
     println(map3["ADB"] ?: "hi")
     println(map2[3]?.first())
