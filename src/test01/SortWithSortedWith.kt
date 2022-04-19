@@ -43,12 +43,16 @@ fun main() {
 
     val pList = mutableListOf(Pair(4,"c"), Pair(2,"b"), Pair(1,"f"))
 
+
     println(pList)
     //[(4, c), (2, b), (1, f)]
 
-    pList.sortBy{it.first} //pList.sortWith(compareBy<Pair<Int, String>> { it.first}.thenBy { it.second })
+    pList.sortWith(compareByDescending<Pair<Int, String>> { it.first}.thenBy{it.second })
+    pList.sortBy{it.first} //
     println(pList)
     //[(1, f), (2, b), (4, c)]
+
+    pList.sumOf { it.first }
 
     pList.sortBy{it.second}
     println(pList)

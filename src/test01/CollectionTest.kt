@@ -83,15 +83,6 @@ fun main() {
     }
 
 
-    for(i in 0..4) {
-        tmp6 += tmp5[i]
-    }
-
-
-
-
-
-
 
 
     val edges = Array<IntArray>(5){ intArrayOf()}
